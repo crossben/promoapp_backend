@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: promoapp_backend
+    container_name: promoapp_backend_api
     ports:
       - "80" # Fixed: Map host port 80 to container port 80
     env_file:
