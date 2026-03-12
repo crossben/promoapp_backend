@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: promoapp_backend
+    ports:
+      - "80" # Fixed: Map host port 80 to container port 80
+    env_file:
+      - .env
+    restart: unless-stopped
