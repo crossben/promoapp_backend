@@ -1,13 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;        // 'Api' avec majuscule !
-use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\CartController;
-use App\Http\Controllers\Api\StoreController;
-use App\Http\Controllers\Api\PurchaseController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\api\AuthController;        // 'Api' avec majuscule !
+use App\Http\Controllers\api\ProductController;
+use App\Http\Controllers\api\CartController;
+use App\Http\Controllers\api\StoreController;
+use App\Http\Controllers\api\PurchaseController;
+use App\Http\Controllers\api\UserController;
+use App\Http\Controllers\api\CategoryController;
 
 // Route de test
 Route::get('/test', function() {
