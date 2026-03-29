@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\AuthController;        // 'Api' avec majuscule !
+use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\CartController;
 use App\Http\Controllers\api\StoreController;

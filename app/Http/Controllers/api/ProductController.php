@@ -162,17 +162,9 @@ class ProductController extends Controller
                 $query->orderBy($sortBy, 'desc');
             }
 
-            $products = $query->get();
+            $products = $query->paginate($request->get('per_page', 15));
 
-            \Log::info('Produits récupérés: ' . $products->count());
-
-            // Ajouter l'URL complète de l'image pour chaque produit
-            $products->transform(function ($product) {
-                $product->image_url = $product->image 
-                    ? url('/products/' . $product->image)
-                    : null;
-                return $product;
-            });
+            \Log::info('Produits récupérés: ' . $products->total());
 
             return response()->json([
                 'success' => true,
@@ -186,6 +178,11 @@ class ProductController extends Controller
                 'message' => 'Erreur de récupération des produits'
             ], 500);
         }
+    }
+
+    public function publicIndex(Request $request)
+    {
+        return $this->index($request);
     }
 
     public function show($id)
@@ -404,6 +401,55 @@ class ProductController extends Controller
                 'success' => false,
                 'message' => 'Erreur de suppression'
             ], 500);
+        }
+    }
+
+    public function updateStock(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'quantity' => 'required|numeric|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+
+            $product = Product::findOrFail($id);
+            $user = auth()->user();
+
+            if ($user->store->id != $product->store_id) {
+                return response()->json(['success' => false, 'message' => 'Non autorisé'], 403);
+            }
+
+            $product->update(['quantity' => $request->quantity]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock mis à jour',
+                'product' => $product
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function byCategory($categoryId)
+    {
+        try {
+            $products = Product::with(['category', 'store'])
+                ->where('category_id', $categoryId)
+                ->where('quantity', '>', 0)
+                ->where('promo_end', '>', Carbon::now())
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'products' => $products
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()], 500);
         }
     }
 }

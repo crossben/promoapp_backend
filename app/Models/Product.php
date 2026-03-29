@@ -11,15 +11,24 @@ class Product extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'name',
+        'description',
         'image', 
         'quantity', 
+        'original_price',
+        'promo_price',
+        'unit',
         'category_id', 
         'store_id',
+        'promo_start',
         'promo_end'
     ];
 
     protected $casts = [
         'quantity' => 'decimal:2',
+        'original_price' => 'decimal:2',
+        'promo_price' => 'decimal:2',
+        'promo_start' => 'datetime',
         'promo_end' => 'datetime',
     ];
 
@@ -44,25 +53,25 @@ class Product extends Model
         return $this->belongsTo(Store::class);
     }
 
-    // Attributs calculés pour compatibilité
-    public function getNameAttribute()
+    // Attributs calculés pour compatibilité (Si les colonnes sont vides)
+    public function getNameAttribute($value)
     {
-        return $this->category ? 'Produit frais - ' . $this->category->name : 'Produit frais';
+        return $value ?: ($this->category ? 'Produit frais - ' . $this->category->name : 'Produit frais');
     }
 
-    public function getDescriptionAttribute()
+    public function getDescriptionAttribute($value)
     {
-        return 'Produit frais en promotion';
+        return $value ?: 'Produit frais en promotion';
     }
 
-    public function getPromoPriceAttribute()
+    public function getPromoPriceAttribute($value)
     {
-        return 0.99;
+        return $value ?: 0.99;
     }
 
-    public function getOriginalPriceAttribute()
+    public function getOriginalPriceAttribute($value)
     {
-        return 1.99;
+        return $value ?: 1.99;
     }
 
     public function getIsActiveAttribute()
@@ -90,9 +99,9 @@ class Product extends Model
         }
     }
 
-    public function getUnitAttribute()
+    public function getUnitAttribute($value)
     {
-        return 'unité';
+        return $value ?: 'unité';
     }
 
     // ACCESSOR CRITIQUE POUR L'IMAGE
