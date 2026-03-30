@@ -31,15 +31,15 @@ RUN apt-get update && apt-get install -y \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
     libzip-dev \
-    libpq-dev \
+    default-mysql-client \
     unzip \
     curl \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# PHP extensions
+# PHP extensions (MySQL instead of PostgreSQL)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_pgsql zip
+    && docker-php-ext-install gd pdo pdo_mysql zip
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -60,10 +60,6 @@ RUN chown -R www-data:www-data /var/www \
     && chmod -R ug+rwx storage bootstrap/cache
 
 EXPOSE 80
-
-# Lightweight internal healthcheck (Dokploy-safe)
-# HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-#     CMD curl -f http://localhost/api/health || exit 1
 
 # Start Apache in foreground
 CMD ["apache2-foreground"]
