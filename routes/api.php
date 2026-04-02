@@ -24,6 +24,10 @@ Route::get('/public/stores', [StoreController::class, 'publicIndex']);
 Route::get('/public/products', [ProductController::class, 'publicIndex']);
 Route::get('/public/categories', [CategoryController::class, 'publicIndex']);
 
+// NOUVELLES ROUTES: Gestion des utilisateurs par ID (sans authentification requise)
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::delete('/users/{id}', [UserController::class, 'delete']);
+
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
     // Test route
@@ -38,6 +42,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [UserController::class, 'getCurrentUser']);
     Route::put('/user/fcm-token', [UserController::class, 'updateFcmToken']);
+    
+    // User profile management (routes existantes)
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::delete('/user/account', [UserController::class, 'deleteAccount']);
     
     // Stores
     Route::get('/stores/user/check', [StoreController::class, 'checkUserStore']);
@@ -84,7 +92,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/notifications/read/{id}', [UserController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [UserController::class, 'markAllAsRead']);
 
-     // Cart Routes
+    // Cart Routes
     Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'getCart']);
         Route::post('/add', [CartController::class, 'addToCart']);
