@@ -1,0 +1,7 @@
+.git
+.github
+phpunit.xml
+.editorconfig
+.gitattributes
+.gitignore
+README.md

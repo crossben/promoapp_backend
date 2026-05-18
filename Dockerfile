@@ -25,29 +25,32 @@ FROM php:8.2-apache
 
 WORKDIR /var/www
 
-# System dependencies
+# System dependencies (including libpq-dev for PostgreSQL support)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
     libzip-dev \
+    libpq-dev \
     default-mysql-client \
+    postgresql-client \
     unzip \
     curl \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# PHP extensions (MySQL instead of PostgreSQL)
+# PHP extensions (supporting both MySQL and PostgreSQL to be database-agnostic)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Configure Apache DocumentRoot to /var/www/public
+# Configure Apache DocumentRoot to /var/www/public and enable AllowOverride All for mod_rewrite (.htaccess)
 ENV APACHE_DOCUMENT_ROOT /var/www/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
+    && sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 # Copy application
 COPY --from=builder /app /var/www
